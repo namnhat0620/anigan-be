@@ -32,6 +32,11 @@
 $ npm install
 ```
 
+## Config .env
+```bash
+ML_SERVER_URL= ${ML-server-url}
+```
+
 ## Running the app
 
 ```bash

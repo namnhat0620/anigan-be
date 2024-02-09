@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { UploadModule } from './upload/upload.module';
+import { DownloadModule } from './download/download.module';
+import { AniganModule } from './anigan/anigan.module';
+import { config } from 'dotenv';
+
+config(); // Loads the environment variables from .env
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [UploadModule, DownloadModule, AniganModule],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule { }
