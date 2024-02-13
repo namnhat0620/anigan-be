@@ -18,7 +18,7 @@ async function bootstrap() {
   app.use('/uploads', express.static('uploads'));
   app.use('/anigan_photo', express.static('anigan_photo'));
 
-  const port = 3000
+  const port = parseInt(process.env.PORT)
   await app.listen(port);
   console.log(`App running at port: ${port}`);
 
