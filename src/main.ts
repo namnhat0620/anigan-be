@@ -19,7 +19,7 @@ async function bootstrap() {
   app.use('/anigan_photo', express.static('anigan_photo'));
 
   const port = parseInt(process.env.PORT)
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`App running at port: ${port}`);
 
 }
