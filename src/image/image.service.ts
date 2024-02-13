@@ -4,6 +4,8 @@ import { PaginationDto } from 'src/utils/dto/pagination.dto';
 import { ImageEntity } from './entity/image.entity';
 import { Repository } from 'typeorm';
 import { SaveImageDto } from './dto/save-image.dto';
+import { ImageType } from 'src/utils/enum/image.enum';
+import { RefImageResponse } from './response/list-reference-image.response';
 
 @Injectable()
 export class ImageService {
@@ -18,10 +20,19 @@ export class ImageService {
         const limit = +paginationDto.limit || 20;
         const skip = (page - 1) * limit;
 
-        await this.imageRepository.find({
+        const [listRefImg, total_record] = await this.imageRepository.findAndCount({
+            where: { type: ImageType.REFERENCE_IMAGE },
             take: limit,
-            skip
+            skip,
+            order: { image_id: 'DESC' }
         })
+
+        const list = RefImageResponse.mapToList(listRefImg)
+        return {
+            limit,
+            total_record,
+            list
+        }
     }
 
     async saveImage(saveImageDto: SaveImageDto) {

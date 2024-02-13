@@ -26,6 +26,16 @@ export class RefImageResponse {
         2: ANIGAN_IMAGE`
     })
     type: number;
+
+    constructor(data?: RefImageResponse) {
+        this.image_id = data?.image_id;
+        this.url = data?.url;
+        this.type = data?.type
+    }
+
+    static mapToList(data?: RefImageResponse[]) {
+        return data.map(item => new RefImageResponse(item))
+    }
 }
 
 export class ListRefImageResponse extends PaginationResponse {
