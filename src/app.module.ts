@@ -6,6 +6,7 @@ import { config } from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ImageModule } from './image/image.module';
 import { ImageEntity } from './image/entity/image.entity';
+import { AppController } from './app.controller';
 
 config(); // Loads the environment variables from .env
 
@@ -28,7 +29,7 @@ config(); // Loads the environment variables from .env
     }),
     ImageModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule { }
