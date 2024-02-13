@@ -5,6 +5,7 @@ import { storageConfig } from '../utils/config/upload';
 import { ApiTags } from '@nestjs/swagger';
 import { ImageService } from 'src/image/image.service';
 import { ImageType } from 'src/utils/enum/image.enum';
+import { UrlResponse } from './response/url.response';
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -39,7 +40,7 @@ export class UploadController {
       type: ImageType.REFERENCE_IMAGE,
       url: file.path
     })
-    return { path: file.path }
+    return new UrlResponse(file.path)
   }
 
   @UseInterceptors(FileInterceptor('file', {
@@ -58,12 +59,16 @@ export class UploadController {
     }
   }))
   @Post('user')
-  uploadUserImageAndFailValidation(
+  async uploadUserImageAndFailValidation(
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
-    return { path: file.path }
+    await this.imageService.saveImage({
+      type: ImageType.USER_IMAGE,
+      url: file.path
+    })
+    return new UrlResponse(file.path)
   }
 }
