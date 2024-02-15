@@ -1,7 +1,6 @@
 export class UrlResponse {
-    url: string
-    constructor(data?: string) {
+    static toString(url: string) {
         const baseUrl = "https://anigan-be-production.up.railway.app/";
-        this.url = `${baseUrl}${data}`;
+        return `${baseUrl}${url}`
     }
 }
