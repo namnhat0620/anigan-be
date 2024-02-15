@@ -45,19 +45,24 @@ export class MlServerService {
         return response.data.filename;
     }
 
-    async downloadImage(filename: string, url: string): Promise<string> {
-        const response = await axios.get(`${url}/${filename}`, {
-            responseType: 'arraybuffer',
-        });
+    async downloadImage(filename: string, mlServerUrl: string): Promise<string> {
+        const temp = filename.split("/")
+        const name = temp[temp.length - 1]
+        const response = await axios.post(
+            mlServerUrl,
+            {
+                url: filename
+            },
+            {
+                responseType: 'arraybuffer',
+            });
 
         const buffer = Buffer.from(response.data, 'binary');
-        fs.writeFileSync(`uploads/anigan/${filename}`, buffer);
-        return `uploads/anigan/${filename}`
+        fs.writeFileSync(filename, buffer);
+        return filename
     }
 
     async transform(transformDto: TransformDto) {
-        console.log({ transformDto });
-
         //Upload user image
         await this.uploadImage(transformDto.source_img, process.env.ML_SERVER_URL)
 
@@ -74,6 +79,6 @@ export class MlServerService {
 
         const filename: string = response.data.split("/").pop().replace('"', '')
 
-        return await this.downloadImage(filename, `${process.env.ML_SERVER_URL}/download`)
+        return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
     }
 }

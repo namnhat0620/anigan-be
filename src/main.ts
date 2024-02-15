@@ -15,8 +15,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.use('/uploads', express.static('uploads'));
-  app.use('/anigan_photo', express.static('anigan_photo'));
+  app.use('/public', express.static('public'));
 
   const port = parseInt(process.env.PORT)
   await app.listen(port, '0.0.0.0');
