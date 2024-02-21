@@ -28,9 +28,8 @@ export class RefImageResponse {
     type: number;
 
     constructor(data?: RefImageResponse) {
-        const baseUrl = "https://anigan-be-production.up.railway.app/";
         this.image_id = data?.image_id;
-        this.url = `${baseUrl}${data?.url}`;
+        this.url = `${process.env.BE_SERVER_URL}/${data?.url}`;
         this.type = data?.type
     }
 
