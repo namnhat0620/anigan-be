@@ -6,12 +6,13 @@ import { ImageModule } from './image/image.module';
 import { ImageEntity } from './image/entity/image.entity';
 import { AppController } from './app.controller';
 import { MlServerModule } from './ml_server/ml_server.module';
+import { KeycloakModule } from './keycloak/keycloak.module';
 
 config(); // Loads the environment variables from .env
 
 @Module({
   imports: [
-    UploadModule, MlServerModule, ImageModule,
+    UploadModule, MlServerModule, ImageModule, KeycloakModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
