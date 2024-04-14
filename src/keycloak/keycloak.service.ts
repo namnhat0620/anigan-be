@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
 import axios from 'axios';
-import * as https from 'https';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class KeycloakService {
@@ -11,8 +10,8 @@ export class KeycloakService {
     const { username, password } = loginDto;
     try {
       const response = await axios.post(url, {
-        client_id: 'anigan-be',
-        client_secret: 'i2UrEL07qUBU2sEQSTIDQ0gUuOaC9WtF',
+        client_id: process.env.KEYCLOAK_CLIENT_ID,
+        client_secret: process.env.KEYCLOAK_CLIENT_SECRET_KEY,
         grant_type: 'password',
         username,
         password,
