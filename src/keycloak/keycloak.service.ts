@@ -6,7 +6,7 @@ import * as https from 'https';
 @Injectable()
 export class KeycloakService {
   async login(loginDto: LoginDto) {
-    const url = `${process.env.KEYCLOAK_URL}${process.env.KEYCLOAK_PREFIX}protocol/openid-connect/token`;
+    const url = `${process.env.KEYCLOAK_URL}/${process.env.KEYCLOAK_PREFIX}protocol/openid-connect/token`;
     console.log({ url });
 
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
