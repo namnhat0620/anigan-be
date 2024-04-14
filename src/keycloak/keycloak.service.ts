@@ -7,9 +7,6 @@ import * as https from 'https';
 export class KeycloakService {
   async login(loginDto: LoginDto) {
     const url = `${process.env.KEYCLOAK_URL}/${process.env.KEYCLOAK_PREFIX}protocol/openid-connect/token`;
-    console.log({ url });
-
-    const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
     const { username, password } = loginDto;
     try {
@@ -23,7 +20,6 @@ export class KeycloakService {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        httpsAgent,
       });
       return response.data
     } catch (error) {
