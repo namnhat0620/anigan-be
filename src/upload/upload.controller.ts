@@ -87,6 +87,11 @@ export class UploadController {
       source_img: path
     })
 
+    await this.imageService.saveImage({
+      url,
+      type: ImageType.ANIGAN_IMAGE
+    })
+
     return { url: UrlResponse.toString(url) }
   }
 }
