@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationDto } from 'src/utils/dto/pagination.dto';
-import { ImageEntity } from './entity/image.entity';
 import { Repository } from 'typeorm';
+import { GetImageQueryDto } from './dto/get-image.dto';
 import { SaveImageDto } from './dto/save-image.dto';
-import { ImageType } from 'src/utils/enum/image.enum';
+import { ImageEntity } from './entity/image.entity';
 import { RefImageResponse } from './response/list-reference-image.response';
 
 @Injectable()
@@ -14,14 +13,14 @@ export class ImageService {
         private readonly imageRepository: Repository<ImageEntity>,
     ) { }
 
-    async getListRefImage(paginationDto: PaginationDto) {
+    async getListImage(getImageQueryDto: GetImageQueryDto) {
 
-        const page = +paginationDto.page || 1;
-        const limit = +paginationDto.limit || 20;
+        const page = +getImageQueryDto.page || 1;
+        const limit = +getImageQueryDto.limit || 20;
         const skip = (page - 1) * limit;
 
         const [listRefImg, total_record] = await this.imageRepository.findAndCount({
-            where: { type: ImageType.REFERENCE_IMAGE },
+            where: { type: getImageQueryDto.type },
             take: limit,
             skip,
             order: { image_id: 'DESC' }
