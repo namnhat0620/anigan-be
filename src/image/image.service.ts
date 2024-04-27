@@ -35,6 +35,6 @@ export class ImageService {
     }
 
     async saveImage(saveImageDto: SaveImageDto) {
-        await this.imageRepository.save(saveImageDto)
+        return await this.imageRepository.save(saveImageDto)
     }
 }

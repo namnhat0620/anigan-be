@@ -7,6 +7,8 @@ import { MlServerService } from 'src/ml_server/ml_server.service';
 import { ImageType } from 'src/utils/enum/image.enum';
 import { storageConfig } from '../utils/config/upload';
 import { UrlResponse } from './response/url.response';
+import { ImageEntity } from 'src/image/entity/image.entity';
+import { RefImageResponse } from 'src/image/response/list-reference-image.response';
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -91,11 +93,11 @@ export class UploadController {
       model_id: body.model_id
     })
 
-    await this.imageService.saveImage({
+    const savedImage: ImageEntity = await this.imageService.saveImage({
       url,
       type: ImageType.ANIGAN_IMAGE
     })
 
-    return { url: UrlResponse.toString(url) }
+    return new RefImageResponse(savedImage)
   }
 }
