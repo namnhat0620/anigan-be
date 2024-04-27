@@ -1,12 +1,12 @@
 import { Body, Controller, HttpException, HttpStatus, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { extname } from 'path';
-import { storageConfig } from '../utils/config/upload';
 import { ApiTags } from '@nestjs/swagger';
+import { extname } from 'path';
 import { ImageService } from 'src/image/image.service';
-import { ImageType } from 'src/utils/enum/image.enum';
-import { UrlResponse } from './response/url.response';
 import { MlServerService } from 'src/ml_server/ml_server.service';
+import { ImageType } from 'src/utils/enum/image.enum';
+import { storageConfig } from '../utils/config/upload';
+import { UrlResponse } from './response/url.response';
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -34,7 +34,7 @@ export class UploadController {
   @Post('reference')
   async uploadReferenceImageAndFailValidation(
     @Req() req: any,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File
   ) {
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
@@ -70,7 +70,10 @@ export class UploadController {
   async uploadUserImageAndFailValidation(
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { reference_image_url: string }
+    @Body() body: {
+      reference_image_url: string,
+      model_id: string
+    }
   ) {
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
@@ -84,7 +87,8 @@ export class UploadController {
     const url = await this.mlServerService.transform({
       user_id: null,
       reference_img: body.reference_image_url,
-      source_img: path
+      source_img: path,
+      model_id: body.model_id
     })
 
     await this.imageService.saveImage({

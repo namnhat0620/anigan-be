@@ -62,7 +62,7 @@ export class MlServerService {
         return filename
     }
 
-    async transform(transformDto: TransformDto) {
+    async transform(transformDto: TransformDto): Promise<string> {
         //Upload user image
         await this.uploadImage(transformDto.source_img, process.env.ML_SERVER_URL)
 
@@ -71,14 +71,14 @@ export class MlServerService {
             `${process.env.ML_SERVER_URL}/transform`,
             {
                 referenceImg: `/content/${this.convertUrl(transformDto.reference_img)}`,
-                sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`
+                sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
+                model_id: transformDto.model_id
             },
             {
                 responseType: 'text'
             });
 
         const filename: string = response.data.split("/").pop().replace('"', '')
-
         return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
     }
 }

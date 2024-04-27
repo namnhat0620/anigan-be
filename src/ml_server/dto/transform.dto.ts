@@ -20,4 +20,10 @@ export class TransformDto {
         description: "url reference image"
     })
     reference_img: string
+
+    @ApiProperty({
+        type: String,
+        description: "id of model ml"
+    })
+    model_id: string
 }
