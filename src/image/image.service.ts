@@ -5,12 +5,16 @@ import { GetImageQueryDto } from './dto/get-image.dto';
 import { SaveImageDto } from './dto/save-image.dto';
 import { ImageEntity } from './entity/image.entity';
 import { RefImageResponse } from './response/list-reference-image.response';
+import { TransformDto } from './dto/transform.dto';
+import { MlServerService } from 'src/ml_server/ml_server.service';
+import { ImageType } from 'src/utils/enum/image.enum';
 
 @Injectable()
 export class ImageService {
     constructor(
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
+        private readonly mlService: MlServerService
     ) { }
 
     async getListImage(getImageQueryDto: GetImageQueryDto) {
@@ -36,5 +40,14 @@ export class ImageService {
 
     async saveImage(saveImageDto: SaveImageDto) {
         return await this.imageRepository.save(saveImageDto)
+    }
+
+    async transform(transformDto: TransformDto): Promise<RefImageResponse> {
+        const url = await this.mlService.transform(transformDto)
+        const savedImage = await this.saveImage({
+            url,
+            type: ImageType.ANIGAN_IMAGE
+        })
+        return new RefImageResponse(savedImage)
     }
 }

@@ -81,23 +81,11 @@ export class UploadController {
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
 
     const path = file.path.split('\\').join('/')
-    await this.imageService.saveImage({
+    const savedImage = await this.imageService.saveImage({
       type: ImageType.USER_IMAGE,
       url: path
     })
-
-    const url = await this.mlServerService.transform({
-      user_id: null,
-      reference_img: body.reference_image_url,
-      source_img: path,
-      model_id: body.model_id
-    })
-
-    const savedImage: ImageEntity = await this.imageService.saveImage({
-      url,
-      type: ImageType.ANIGAN_IMAGE
-    })
-
+    await this.mlServerService.uploadImage(path, process.env.ML_SERVER_URL)
     return new RefImageResponse(savedImage)
   }
 }

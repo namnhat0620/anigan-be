@@ -63,16 +63,11 @@ export class MlServerService {
     }
 
     async transform(transformDto: TransformDto): Promise<string> {
-        //Upload user image
-        await this.uploadImage(transformDto.source_img, process.env.ML_SERVER_URL)
-
         //Send request to ML server
         const response = await axios.post(
             `${process.env.ML_SERVER_URL}/transform`,
             {
-                referenceImg: `/content/${this.convertUrl(transformDto.reference_img)}`,
                 sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
-                model_id: transformDto.model_id
             },
             {
                 responseType: 'text'
