@@ -68,6 +68,7 @@ export class MlServerService {
             `${process.env.ML_SERVER_URL}/transform`,
             {
                 sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
+                referenceImg: transformDto.reference_img
             },
             {
                 responseType: 'text'
