@@ -16,10 +16,10 @@ export class TransformDto {
     source_img: string
 
     @ApiProperty({
-        type: String,
+        type: Number,
         description: "url reference image"
     })
-    reference_img: string
+    reference_img: number
 
     @ApiProperty({
         type: String,
