@@ -25,7 +25,7 @@ config(); // Loads the environment variables from .env
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DBNAME,
       entities: [ImageEntity, PlanEntity, AniganUserEntity, MobileTrackingEntity],
-      synchronize: true,
+      // synchronize: true,
       ssl: true,
       extra: {
         project: process.env.ENDPOINT_ID,
