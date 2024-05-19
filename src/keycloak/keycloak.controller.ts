@@ -19,7 +19,7 @@ export class KeycloakController {
 
   @Post("logout")
   logout(
-    @Headers('authorization') authHeader: string,
+    @Headers('Authorization') authHeader: string,
   ) {
     return this.keycloakService.logout(authHeader);
   }
