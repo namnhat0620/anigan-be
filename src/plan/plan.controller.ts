@@ -66,10 +66,10 @@ export class PlanController {
   })
   async registerPlan(
     @Headers('authorization') authHeader: string,
-    @Body() createPlanDto: CreatePlanDto,
+    @Body() registerPlanDto: RegisterPlanDto,
     @Res() res: any
   ) {
-    const data = await this.planService.createPlan(authHeader, createPlanDto);
+    const data = await this.planService.registerPlan(authHeader, registerPlanDto);
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 }

@@ -61,7 +61,7 @@ export class PlanService {
     async registerPlan(authHeader: string, registerPlanDto: RegisterPlanDto) {
         console.debug('Enter registerPlan with', { authHeader, registerPlanDto });
 
-        // Get user email
+        // Get user id
         const user_id = this.authService.extractSubFromToken(authHeader);
         const { plan_id } = registerPlanDto;
         await this.aniganUserRepository.update(
@@ -83,6 +83,7 @@ export class PlanService {
             updated_by: user_id
         })
     }
+
     async getListPlan(paginationDto: PaginationDto) {
         console.debug('Enter getListPlan with', { paginationDto })
 
