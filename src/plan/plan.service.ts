@@ -68,6 +68,9 @@ export class PlanService {
             { keycloak_user_id: user_id },
             { plan: { plan_id } }
         )
+
+        const plan = await this.planRepository.findOneBy({ plan_id })
+        return { number_of_generation: plan.number_of_generation }
     }
 
     async createPlan(authHeader: string, createPlanDto: CreatePlanDto) {
