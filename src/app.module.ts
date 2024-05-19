@@ -7,12 +7,16 @@ import { ImageEntity } from './image/entity/image.entity';
 import { AppController } from './app.controller';
 import { MlServerModule } from './ml_server/ml_server.module';
 import { KeycloakModule } from './keycloak/keycloak.module';
+import { PlanModule } from './plan/plan.module';
+import { PlanEntity } from './plan/entity/plan.entity';
+import { AniganUserEntity } from './keycloak/entities/anigan_user.entity';
+import { MobileTrackingEntity } from './plan/entity/mobile_tracking.entity';
 
 config(); // Loads the environment variables from .env
 
 @Module({
   imports: [
-    UploadModule, MlServerModule, ImageModule, KeycloakModule,
+    UploadModule, MlServerModule, ImageModule, KeycloakModule, PlanModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -20,7 +24,7 @@ config(); // Loads the environment variables from .env
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DBNAME,
-      entities: [ImageEntity],
+      entities: [ImageEntity, PlanEntity, AniganUserEntity, MobileTrackingEntity],
       synchronize: true,
       ssl: true,
       extra: {
