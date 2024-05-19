@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { KeycloakService } from './keycloak.service';
 import { SignUpDto } from './dto/signup.dto';
@@ -15,5 +15,12 @@ export class KeycloakController {
   @Post("signup")
   signUp(@Body() loginDto: SignUpDto) {
     return this.keycloakService.signUp(loginDto);
+  }
+
+  @Post("logout")
+  logout(
+    @Headers('authorization') authHeader: string,
+  ) {
+    return this.keycloakService.logout(authHeader);
   }
 }

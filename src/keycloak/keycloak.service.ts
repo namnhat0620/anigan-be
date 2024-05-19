@@ -7,12 +7,16 @@ import { User } from './dto/user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AniganUserEntity } from './entities/anigan_user.entity';
 import { Repository } from 'typeorm';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class KeycloakService {
+
   constructor(
     @InjectRepository(AniganUserEntity)
     private readonly userRepository: Repository<AniganUserEntity>,
+
+    private readonly authService: AuthService
   ) { }
 
   async signUp(userData: SignUpDto): Promise<any> {
@@ -54,6 +58,29 @@ export class KeycloakService {
         grant_type: 'password',
         username,
         password,
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      return response.data
+    } catch (error) {
+      // Handle error
+      console.error('Error:', error.response);
+      throw error;
+    }
+  }
+
+  async logout(authHeader: string) {
+    console.log("Enter logout with", { authHeader });
+
+    const refreshToken = this.authService.extractToken(authHeader);
+    const url = `${process.env.KEYCLOAK_URL}/${process.env.KEYCLOAK_PREFIX}protocol/openid-connect/logout`;
+    try {
+      const response = await axios.post(url, {
+        client_id: process.env.KEYCLOAK_CLIENT_ID,
+        client_secret: process.env.KEYCLOAK_CLIENT_SECRET_KEY,
+        refresh_token: refreshToken
       }, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

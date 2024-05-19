@@ -9,13 +9,7 @@ export class AuthService {
         return decodedToken['sub']; // Assuming 'sub' field exists in the token
     }
 
-    extractEmailFromToken(authHeader: string): string {
-        const token = this.extractToken(authHeader);
-        const decodedToken = jwt.decode(token);
-        return decodedToken['email']
-    }
-
-    private extractToken(authHeader: string): string {
+    extractToken(authHeader: string): string {
         if (!authHeader) {
             throw new Error('Authorization header missing');
         }
