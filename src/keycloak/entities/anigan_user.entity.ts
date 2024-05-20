@@ -22,6 +22,7 @@ export class AniganUserEntity {
 
     @Column({
         type: 'timestamp',
+        nullable: true
     })
     expired_at: Date;
 }

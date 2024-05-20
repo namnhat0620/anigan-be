@@ -20,6 +20,8 @@ export class KeycloakService {
   ) { }
 
   async signUp(userData: SignUpDto): Promise<any> {
+    console.log("Enter signUp with", { userData });
+
     const accessToken = await this.login({
       username: "admin@gmail.com",
       password: "admin"
@@ -43,6 +45,7 @@ export class KeycloakService {
       });
       return signUpResponse.data
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(error?.response?.data?.errorMessage);
     }
   }
