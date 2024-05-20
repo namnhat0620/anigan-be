@@ -74,7 +74,9 @@ export class MlServerService {
                 responseType: 'text'
             });
 
-        if (response.data === "") throw new BadRequestException("Cannot detect your face")
+        if (response.data === '""') throw new BadRequestException("Cannot detect your face")
+        console.log(response);
+
         const filename: string = response.data.split("/").pop().replace('"', '')
         return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
     }
