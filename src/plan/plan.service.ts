@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { MlServerService } from 'src/ml_server/ml_server.service';
-import { ImageType } from 'src/utils/enum/image.enum';
+import * as dayjs from 'dayjs'
 import { AuthService } from 'src/auth/auth.service';
-import { MobileTrackingEntity } from './entity/mobile_tracking.entity';
-import { GetPlanResponse } from './response/get-plan.response';
-import { RegisterPlanDto } from './dto/register-plan.dto';
-import { PlanEntity } from './entity/plan.entity';
 import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
-import { CreatePlanDto } from './dto/create-plan.dto';
 import { PaginationDto } from 'src/utils/dto/pagination.dto';
+import { Repository } from 'typeorm';
+import { CreatePlanDto } from './dto/create-plan.dto';
+import { RegisterPlanDto } from './dto/register-plan.dto';
+import { MobileTrackingEntity } from './entity/mobile_tracking.entity';
+import { PlanEntity } from './entity/plan.entity';
 import { GetAllPlanResponse } from './response/get-all-plan.response';
+import { GetPlanResponse } from './response/get-plan.response';
 
 @Injectable()
 export class PlanService {
@@ -54,6 +53,15 @@ export class PlanService {
         }
         else {
             //TODO: get plan
+            const userId = this.authService.extractSubFromToken(authHeader);
+            const user = await this.aniganUserRepository.findOne({
+                where: { keycloak_user_id: userId },
+                relations: { plan: true }
+            })
+            return new GetPlanResponse({
+                remain_generation: +(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) - user?.number_of_generated,
+                expired_day: dayjs(user?.expired_at).format('yyyy-mm-dd')
+            })
         }
     }
 
@@ -64,12 +72,12 @@ export class PlanService {
         // Get user id
         const user_id = this.authService.extractSubFromToken(authHeader);
         const { plan_id } = registerPlanDto;
+        const plan = await this.planRepository.findOneBy({ plan_id })
         await this.aniganUserRepository.update(
             { keycloak_user_id: user_id },
-            { plan: { plan_id } }
+            { plan: { plan_id }, expired_at: dayjs(new Date()).add(plan?.period, 'month').toDate() }
         )
 
-        const plan = await this.planRepository.findOneBy({ plan_id })
         return { number_of_generation: plan.number_of_generation }
     }
 
