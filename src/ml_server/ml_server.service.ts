@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as fs from 'fs';
 import { promisify } from 'util';
@@ -74,6 +74,7 @@ export class MlServerService {
                 responseType: 'text'
             });
 
+        if (response.data === "") throw new BadRequestException("Cannot detect your face")
         const filename: string = response.data.split("/").pop().replace('"', '')
         return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
     }

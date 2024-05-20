@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GetImageQueryDto } from './dto/get-image.dto';
@@ -8,12 +8,20 @@ import { RefImageResponse } from './response/list-reference-image.response';
 import { TransformDto } from './dto/transform.dto';
 import { MlServerService } from 'src/ml_server/ml_server.service';
 import { ImageType } from 'src/utils/enum/image.enum';
+import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
+import { PlanService } from 'src/plan/plan.service';
+import { MobileTrackingEntity } from 'src/plan/entity/mobile_tracking.entity';
 
 @Injectable()
 export class ImageService {
     constructor(
         @InjectRepository(ImageEntity)
         private readonly imageRepository: Repository<ImageEntity>,
+        @InjectRepository(AniganUserEntity)
+        private readonly userRepository: Repository<AniganUserEntity>,
+        @InjectRepository(MobileTrackingEntity)
+        private readonly mobileTrackingRepository: Repository<MobileTrackingEntity>,
+        private readonly planService: PlanService,
         private readonly mlService: MlServerService
     ) { }
 
@@ -42,12 +50,49 @@ export class ImageService {
         return await this.imageRepository.save(saveImageDto)
     }
 
-    async transform(transformDto: TransformDto): Promise<RefImageResponse> {
-        const url = await this.mlService.transform(transformDto)
-        const savedImage = await this.saveImage({
-            url,
-            type: ImageType.ANIGAN_IMAGE
-        })
-        return new RefImageResponse(savedImage)
+    async transform(token: string, transformDto: TransformDto): Promise<RefImageResponse> {
+        console.log("Enter transform with", { token, transformDto });
+
+        if (!token) {
+            const mobileTracking = await this.planService.getTrackingMobile(transformDto.mobile_id);
+            if (mobileTracking.number_of_generated >= +process.env.MAX_TIME_GENERATION) {
+                throw new BadRequestException("Reach limit of generation!")
+            }
+            else {
+                const url = await this.mlService.transform(transformDto)
+                const savedImage = await this.saveImage({
+                    url,
+                    type: ImageType.ANIGAN_IMAGE,
+                    created_by: mobileTracking.mobile_id,
+                    updated_by: mobileTracking.mobile_id
+                })
+                await this.mobileTrackingRepository.update({
+                    mobile_id: mobileTracking.mobile_id
+                }, {
+                    number_of_generated: (mobileTracking.number_of_generated ?? 0) + 1
+                })
+                return new RefImageResponse(savedImage)
+            }
+        }
+        else {
+            const user = await this.planService.getAniganUser(token)
+            if (+(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) <= user?.number_of_generated) {
+                throw new BadRequestException("Reach limit of generation!")
+            }
+            else {
+                const url = await this.mlService.transform(transformDto)
+                const savedImage = await this.saveImage({
+                    url,
+                    type: ImageType.ANIGAN_IMAGE,
+                    created_by: user.keycloak_user_id,
+                    updated_by: user.keycloak_user_id
+                })
+                await this.userRepository.update({
+                    user_id: user?.user_id
+                }, {
+                    number_of_generated: (user?.number_of_generated ?? 0) + 1
+                })
+            }
+        }
     }
 }

@@ -26,4 +26,11 @@ export class TransformDto {
         description: "id of model ml"
     })
     model_id: string
+
+    @ApiProperty({
+        type: String,
+        description: "Device id",
+        required: true
+    })
+    mobile_id: string
 }

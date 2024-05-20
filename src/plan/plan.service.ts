@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs'
 import { AuthService } from 'src/auth/auth.service';
@@ -30,37 +30,18 @@ export class PlanService {
 
         const maxTimeGenerationConfig = +process.env.MAX_TIME_GENERATION
         if (!authHeader) {
-            //TODO: Check user not login
-            const mobileTracking = await this.mobileTrackingRepository.findOneBy({
-                mobile_id: device_id
+            const mobileTracking = await this.getTrackingMobile(authHeader)
+            return new GetPlanResponse({
+                remain_generation: maxTimeGenerationConfig - mobileTracking.number_of_generated,
+                expired_day: "Illuminate the pro flag"
             })
-            if (mobileTracking == null) {
-                await this.mobileTrackingRepository.save({
-                    mobile_id: device_id,
-                    number_of_generated: 0
-                })
-                return new GetPlanResponse({
-                    remain_generation: maxTimeGenerationConfig,
-                    expired_day: "Illuminate the pro flag"
-                })
-            }
-            else {
-                return new GetPlanResponse({
-                    remain_generation: maxTimeGenerationConfig - mobileTracking.number_of_generated,
-                    expired_day: "Illuminate the pro flag"
-                })
-            }
         }
         else {
             //TODO: get plan
-            const userId = this.authService.extractSubFromToken(authHeader);
-            const user = await this.aniganUserRepository.findOne({
-                where: { keycloak_user_id: userId },
-                relations: { plan: true }
-            })
+            const user = await this.getAniganUser(authHeader)
             return new GetPlanResponse({
                 remain_generation: +(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) - user?.number_of_generated,
-                expired_day: dayjs(user?.expired_at).format('yyyy-mm-dd')
+                expired_day: user?.expired_at ? `Expired day: ${dayjs(user.expired_at).format('YYYY-MM-DD')}` : "Illuminate the pro flag"
             })
         }
     }
@@ -116,16 +97,29 @@ export class PlanService {
         }
     }
 
-    // async saveImage(saveImageDto: SaveImageDto) {
-    //     return await this.imageRepository.save(saveImageDto)
-    // }
+    async getTrackingMobile(device_id: string): Promise<MobileTrackingEntity> {
+        //TODO: Check user not login
+        const mobileTracking = await this.mobileTrackingRepository.findOneBy({
+            mobile_id: device_id
+        })
+        if (mobileTracking) return mobileTracking
+        else {
+            return await this.mobileTrackingRepository.save({
+                mobile_id: device_id,
+                number_of_generated: 0
+            })
+        }
+    }
 
-    // async transform(transformDto: TransformDto): Promise<RefImageResponse> {
-    //     const url = await this.mlService.transform(transformDto)
-    //     const savedImage = await this.saveImage({
-    //         url,
-    //         type: ImageType.ANIGAN_IMAGE
-    //     })
-    //     return new RefImageResponse(savedImage)
-    // }
+    async getAniganUser(token: string): Promise<AniganUserEntity> {
+        const userId = this.authService.extractSubFromToken(token);
+        const user = await this.aniganUserRepository.findOne({
+            where: { keycloak_user_id: userId },
+            relations: { plan: true }
+        })
+        if (user == null) {
+            throw new BadRequestException("Cannot find user's information")
+        }
+        return user
+    }
 }

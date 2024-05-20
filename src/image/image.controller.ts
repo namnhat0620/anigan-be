@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpStatus, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseResponse } from 'src/utils/response/base.response';
 import { GetImageQueryDto } from './dto/get-image.dto';
@@ -28,10 +28,11 @@ export class ImageController {
   @Post('transform')
   @ApiOperation({ summary: 'Transform images', })
   async transformImage(
+    @Headers('Authorization') token: string,
     @Body() transformImageDto: TransformDto,
     @Res() res: any
   ) {
-    const data = await this.imageService.transform(transformImageDto);
+    const data = await this.imageService.transform(token, transformImageDto);
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 }

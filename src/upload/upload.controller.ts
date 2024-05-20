@@ -45,7 +45,9 @@ export class UploadController {
     //Save to db
     await this.imageService.saveImage({
       type: ImageType.REFERENCE_IMAGE,
-      url: path
+      url: path,
+      created_by: 'admin',
+      updated_by: 'admin'
     })
 
     //Save to ML server
@@ -83,7 +85,9 @@ export class UploadController {
     const path = file.path.split('\\').join('/')
     const savedImage = await this.imageService.saveImage({
       type: ImageType.USER_IMAGE,
-      url: path
+      url: path,
+      created_by: 'admin',
+      updated_by: 'admin'
     })
     await this.mlServerService.uploadImage(path, process.env.ML_SERVER_URL)
     return new RefImageResponse(savedImage)
