@@ -93,7 +93,7 @@ export class MlServerService {
             if (error.response.status === 404) {
                 throw new BadRequestException("Cannot reach Machine Learning server");
             } else {
-                throw new BadRequestException("Unknown message")
+                throw new BadRequestException(error?.response?.message ?? "Unknown error")
             }
         }
     }
