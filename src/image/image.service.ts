@@ -52,7 +52,7 @@ export class ImageService {
 
     async transform(token: string, transformDto: TransformDto): Promise<RefImageResponse> {
         console.log("Enter transform with", { token, transformDto });
-
+        let savedImage: ImageEntity;
         if (!token) {
             const mobileTracking = await this.planService.getTrackingMobile(transformDto.mobile_id);
             if (mobileTracking.number_of_generated >= +process.env.MAX_TIME_GENERATION) {
@@ -60,7 +60,7 @@ export class ImageService {
             }
             else {
                 const url = await this.mlService.transform(transformDto)
-                const savedImage = await this.saveImage({
+                savedImage = await this.saveImage({
                     url,
                     type: ImageType.ANIGAN_IMAGE,
                     created_by: mobileTracking.mobile_id,
@@ -71,7 +71,6 @@ export class ImageService {
                 }, {
                     number_of_generated: (mobileTracking.number_of_generated ?? 0) + 1
                 })
-                return new RefImageResponse(savedImage)
             }
         }
         else {
@@ -81,7 +80,7 @@ export class ImageService {
             }
             else {
                 const url = await this.mlService.transform(transformDto)
-                const savedImage = await this.saveImage({
+                savedImage = await this.saveImage({
                     url,
                     type: ImageType.ANIGAN_IMAGE,
                     created_by: user.keycloak_user_id,
@@ -94,5 +93,6 @@ export class ImageService {
                 })
             }
         }
+        return new RefImageResponse(savedImage)
     }
 }
