@@ -23,4 +23,11 @@ export class KeycloakController {
   ) {
     return this.keycloakService.logout(authHeader);
   }
+
+  @Post("refresh")
+  refresh(
+    @Headers('Authorization') authHeader: string,
+  ) {
+    return this.keycloakService.refreshToken(authHeader);
+  }
 }
