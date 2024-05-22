@@ -46,7 +46,7 @@ export class KeycloakService {
       return signUpResponse.data
     } catch (error) {
       console.log(error);
-      throw new BadRequestException(error?.response?.data?.errorMessage);
+      throw new BadRequestException(error?.response?.data?.errorMessage ?? "Something wrong when sign up");
     }
   }
 
@@ -70,7 +70,7 @@ export class KeycloakService {
     } catch (error) {
       // Handle error
       console.error('Error:', error.response);
-      throw error;
+      throw new BadRequestException(error?.response?.data?.error_description ?? "Something wrong when login");
     }
   }
 
@@ -93,7 +93,7 @@ export class KeycloakService {
     } catch (error) {
       // Handle error
       console.error('Error:', error.response);
-      throw error;
+      throw new BadRequestException(error?.response?.data?.error ?? "Something wrong when logout");
     }
   }
 }
