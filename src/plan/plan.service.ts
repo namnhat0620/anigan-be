@@ -39,6 +39,7 @@ export class PlanService {
         else {
             //TODO: get plan
             const user = await this.getAniganUser(authHeader)
+
             return new GetPlanResponse({
                 remain_generation: +(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) - user?.number_of_generated,
                 expired_day: user?.expired_at ? `Expired day: ${dayjs(user.expired_at).format('YYYY-MM-DD')}` : "Illuminate the pro flag"
@@ -56,7 +57,7 @@ export class PlanService {
         const plan = await this.planRepository.findOneBy({ plan_id })
         await this.aniganUserRepository.update(
             { keycloak_user_id: user_id },
-            { plan: { plan_id }, expired_at: dayjs(new Date()).add(plan?.period, 'month').toDate() }
+            { plan: plan, expired_at: dayjs(new Date()).add(plan?.period, 'month').toDate() }
         )
 
         return { number_of_generation: plan.number_of_generation }

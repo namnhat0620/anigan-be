@@ -35,14 +35,22 @@ export class MlServerService {
             await this.getFileBlob(fileDir),
             this.convertUrl(fileDir)
         )
+        try {
+            const response = await axios.post(`${url}/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
 
-        const response = await axios.post(`${url}/upload`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+            return response.data.filename;
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 404) {
+                throw new BadRequestException("Cannot reach Machine Learning server");
+            } else {
+                throw new BadRequestException("Unknown message")
             }
-        });
-
-        return response.data.filename;
+        }
     }
 
     async downloadImage(filename: string, mlServerUrl: string): Promise<string> {
@@ -63,21 +71,30 @@ export class MlServerService {
     }
 
     async transform(transformDto: TransformDto): Promise<string> {
-        //Send request to ML server
-        const response = await axios.post(
-            `${process.env.ML_SERVER_URL}/transform`,
-            {
-                sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
-                referenceImg: transformDto.reference_img
-            },
-            {
-                responseType: 'text'
-            });
+        try {
+            //Send request to ML server
+            const response = await axios.post(
+                `${process.env.ML_SERVER_URL}/transform`,
+                {
+                    sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
+                    referenceImg: transformDto.reference_img
+                },
+                {
+                    responseType: 'text'
+                });
 
-        if (response.data === '""') throw new BadRequestException("Cannot detect your face")
-        console.log(response);
+            if (response.data === '""') throw new BadRequestException("Cannot detect your face")
+            console.log(response);
 
-        const filename: string = response.data.split("/").pop().replace('"', '')
-        return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
+            const filename: string = response.data.split("/").pop().replace('"', '')
+            return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
+        } catch (error) {
+            console.log(error);
+            if (error.response.status === 404) {
+                throw new BadRequestException("Cannot reach Machine Learning server");
+            } else {
+                throw new BadRequestException("Unknown message")
+            }
+        }
     }
 }
