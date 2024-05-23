@@ -52,8 +52,8 @@ export class KeycloakService {
 
   async login(loginDto: LoginDto) {
     const url = `${process.env.KEYCLOAK_URL}/${process.env.KEYCLOAK_PREFIX}protocol/openid-connect/token`;
-
     const { username, password } = loginDto;
+
     try {
       const response = await axios.post(url, {
         client_id: process.env.KEYCLOAK_CLIENT_ID,

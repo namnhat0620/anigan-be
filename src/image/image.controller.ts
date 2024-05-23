@@ -18,10 +18,11 @@ export class ImageController {
     status: HttpStatus.OK
   })
   async getListRefImage(
+    @Headers('Authorization') token: string,
     @Query() getImageQueryDto: GetImageQueryDto,
     @Res() res: any
   ) {
-    const data = await this.imageService.getListImage(getImageQueryDto);
+    const data = await this.imageService.getListImage(token, getImageQueryDto);
     return res.status(HttpStatus.OK).send(new BaseResponse({ data }))
   }
 

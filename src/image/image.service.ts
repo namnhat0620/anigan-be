@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Or, Repository } from 'typeorm';
 import { GetImageQueryDto } from './dto/get-image.dto';
 import { SaveImageDto } from './dto/save-image.dto';
 import { ImageEntity } from './entity/image.entity';
@@ -11,6 +11,7 @@ import { ImageType } from 'src/utils/enum/image.enum';
 import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
 import { PlanService } from 'src/plan/plan.service';
 import { MobileTrackingEntity } from 'src/plan/entity/mobile_tracking.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class ImageService {
@@ -22,17 +23,25 @@ export class ImageService {
         @InjectRepository(MobileTrackingEntity)
         private readonly mobileTrackingRepository: Repository<MobileTrackingEntity>,
         private readonly planService: PlanService,
-        private readonly mlService: MlServerService
+        private readonly mlService: MlServerService,
+        private readonly authService: AuthService
     ) { }
 
-    async getListImage(getImageQueryDto: GetImageQueryDto) {
-
+    async getListImage(headerToken: string, getImageQueryDto: GetImageQueryDto) {
+        const userId = !headerToken ? "" : this.authService.extractSubFromToken(headerToken)
         const page = +getImageQueryDto.page || 1;
         const limit = +getImageQueryDto.limit || 20;
         const skip = (page - 1) * limit;
 
         const [listRefImg, total_record] = await this.imageRepository.findAndCount({
-            where: { type: getImageQueryDto.type },
+            where: [{
+                type: getImageQueryDto.type,
+                created_by: userId
+            },
+            {
+                type: getImageQueryDto.type,
+                created_by: getImageQueryDto.device_id
+            }],
             take: limit,
             skip,
             order: { image_id: 'DESC' }

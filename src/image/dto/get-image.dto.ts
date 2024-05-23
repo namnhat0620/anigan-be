@@ -9,4 +9,10 @@ export class GetImageQueryDto extends PaginationDto {
         required: false
     })
     type: ImageType
+
+    @ApiProperty({
+        type: String,
+        required: false
+    })
+    device_id: string
 }
