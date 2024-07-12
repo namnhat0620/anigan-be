@@ -55,6 +55,7 @@ export class PlanService {
         const user_id = this.authService.extractSubFromToken(authHeader);
         const { plan_id } = registerPlanDto;
         const plan = await this.planRepository.findOneBy({ plan_id })
+        console.log({ plan })
         await this.aniganUserRepository.update(
             { keycloak_user_id: user_id },
             { plan: plan, expired_at: dayjs(new Date()).add(plan?.period, 'month').toDate() }
