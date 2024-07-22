@@ -11,12 +11,17 @@ import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
 import { AniganUserEntity } from './keycloak/entities/anigan_user.entity';
 import { MobileTrackingEntity } from './plan/entity/mobile_tracking.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 config(); // Loads the environment variables from .env
 
 @Module({
   imports: [
     UploadModule, MlServerModule, ImageModule, KeycloakModule, PlanModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
