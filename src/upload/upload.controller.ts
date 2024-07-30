@@ -83,6 +83,10 @@ export class UploadController {
       model_id: string
     }
   ) {
+    console.log("Enter uploadUserImageAndFailValidation with: ", {
+      token, body
+    });
+
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
 
@@ -95,6 +99,8 @@ export class UploadController {
       updated_by: createdBy
     })
     await this.mlServerService.uploadImage(path, process.env.ML_SERVER_URL)
+    console.log("Exit uploadUserImageAndFailValidation with: ", { image: new RefImageResponse(savedImage) });
+
     return new RefImageResponse(savedImage)
   }
 }
