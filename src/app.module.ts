@@ -26,6 +26,10 @@ config(); // Loads the environment variables from .env
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/public',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+      serveRoot: '/client',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -42,12 +46,7 @@ config(); // Loads the environment variables from .env
     }),
   ],
   controllers: [AppController],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    }
-  ],
+  providers: [],
 })
 // export class AppModule { }
 export class AppModule implements NestModule {
