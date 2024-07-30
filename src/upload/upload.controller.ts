@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Headers, HttpException, HttpStatus, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { extname } from 'path';
@@ -9,13 +9,15 @@ import { storageConfig } from '../utils/config/upload';
 import { UrlResponse } from './response/url.response';
 import { ImageEntity } from 'src/image/entity/image.entity';
 import { RefImageResponse } from 'src/image/response/list-reference-image.response';
+import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
   constructor(
     private imageService: ImageService,
-    private mlServerService: MlServerService
+    private mlServerService: MlServerService,
+    private authService: AuthService
   ) { }
 
   @UseInterceptors(FileInterceptor('file', {
@@ -72,9 +74,11 @@ export class UploadController {
   }))
   @Post('user')
   async uploadUserImageAndFailValidation(
+    @Headers('Authorization') token: string,
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
     @Body() body: {
+      mobile_id: string,
       reference_image_url: string,
       model_id: string
     }
@@ -83,11 +87,12 @@ export class UploadController {
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
 
     const path = file.path.split('\\').join('/')
+    const createdBy = !token ? body?.mobile_id : this.authService.extractSubFromToken(token);
     const savedImage = await this.imageService.saveImage({
       type: ImageType.USER_IMAGE,
       url: path,
-      created_by: 'admin',
-      updated_by: 'admin'
+      created_by: createdBy,
+      updated_by: createdBy
     })
     await this.mlServerService.uploadImage(path, process.env.ML_SERVER_URL)
     return new RefImageResponse(savedImage)

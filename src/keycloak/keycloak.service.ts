@@ -66,10 +66,11 @@ export class KeycloakService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      return response.data
+
+      return response?.data
     } catch (error) {
       // Handle error
-      console.error('Error:', error.response);
+      // console.error('Error:', error?.response);
       throw new BadRequestException(error?.response?.data?.error_description ?? "Something wrong when login");
     }
   }
@@ -89,7 +90,7 @@ export class KeycloakService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      return response.data
+      return response?.data
     } catch (error) {
       // Handle error
       console.error('Error:', error.response);

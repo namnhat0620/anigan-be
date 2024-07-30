@@ -6,7 +6,7 @@ export class AuthService {
     extractSubFromToken(authHeader: string): string {
         const token = this.extractToken(authHeader);
         const decodedToken = jwt.decode(token);
-        return decodedToken['sub']; // Assuming 'sub' field exists in the token
+        return decodedToken['sub'].toString(); // Assuming 'sub' field exists in the token
     }
 
     extractToken(authHeader: string): string {

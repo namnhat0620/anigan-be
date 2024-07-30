@@ -8,14 +8,12 @@ async function bootstrap() {
   app.enableCors();
 
   const config = new DocumentBuilder()
-    .setTitle('Chat-app')
-    .setDescription('The chat-app API description')
+    .setTitle('Anigan-BE')
+    .setDescription('The Anigan-BE API description')
     .setVersion('1.7')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
-  app.use('/public', express.static('public'));
 
   const port = parseInt(process.env.PORT)
   await app.listen(port, '0.0.0.0');

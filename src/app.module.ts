@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UploadModule } from './upload/upload.module';
 import { config } from 'dotenv';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,6 +13,9 @@ import { AniganUserEntity } from './keycloak/entities/anigan_user.entity';
 import { MobileTrackingEntity } from './plan/entity/mobile_tracking.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { AuthMiddleware } from './middleware/auth.middleware';
 
 config(); // Loads the environment variables from .env
 
@@ -20,7 +23,8 @@ config(); // Loads the environment variables from .env
   imports: [
     UploadModule, MlServerModule, ImageModule, KeycloakModule, PlanModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client'),
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -38,6 +42,18 @@ config(); // Loads the environment variables from .env
     }),
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    }
+  ],
 })
-export class AppModule { }
+// export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes('/public/*')
+  }
+}
