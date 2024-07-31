@@ -85,7 +85,7 @@ export class ImageService {
         }
         else {
             const user = await this.planService.getAniganUser(token)
-            if (+user?.plan?.plan_id == 4 && dayjs(user?.expired_at).diff(dayjs()) > 0) {
+            if (+user?.plan?.plan_id == 4 && dayjs(user?.expired_at).diff(dayjs(new Date())) > 0) {
                 const url = await this.mlService.transform(transformDto)
                 savedImage = await this.saveImage({
                     url,
