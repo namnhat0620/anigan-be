@@ -54,6 +54,8 @@ export class MlServerService {
     }
 
     async downloadImage(filename: string, mlServerUrl: string): Promise<string> {
+        const temp = filename.split("/")
+        const name = temp[temp.length - 1]
         const response = await axios.post(
             mlServerUrl,
             {
@@ -85,8 +87,7 @@ export class MlServerService {
             console.log(response);
 
             const filename: string = response.data.split("/").pop().replace('"', '')
-            return filename
-            // return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
+            return await this.downloadImage(`public/anigan/${filename}`, `${process.env.ML_SERVER_URL}/download`)
         } catch (error) {
             console.log(error);
             if (error.response.status === 404) {
