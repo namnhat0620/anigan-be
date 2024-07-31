@@ -12,6 +12,7 @@ import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
 import { PlanService } from 'src/plan/plan.service';
 import { MobileTrackingEntity } from 'src/plan/entity/mobile_tracking.entity';
 import { AuthService } from 'src/auth/auth.service';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class ImageService {
@@ -84,7 +85,16 @@ export class ImageService {
         }
         else {
             const user = await this.planService.getAniganUser(token)
-            if (+(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) <= user?.number_of_generated) {
+            if (+user?.plan?.plan_id == 4 && dayjs(user?.expired_at).diff(dayjs()) > 0) {
+                const url = await this.mlService.transform(transformDto)
+                savedImage = await this.saveImage({
+                    url,
+                    type: ImageType.ANIGAN_IMAGE,
+                    created_by: user.keycloak_user_id,
+                    updated_by: user.keycloak_user_id
+                })
+            }
+            else if (+(user?.plan?.number_of_generation ?? process.env.MAX_TIME_GENERATION) <= user?.number_of_generated) {
                 throw new BadRequestException("Reach limit of generation!")
             }
             else {
