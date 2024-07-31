@@ -12,7 +12,7 @@ import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
 import { PlanService } from 'src/plan/plan.service';
 import { MobileTrackingEntity } from 'src/plan/entity/mobile_tracking.entity';
 import { AuthService } from 'src/auth/auth.service';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ImageService {
