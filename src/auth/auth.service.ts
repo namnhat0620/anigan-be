@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
+import { AniganUserEntity } from 'src/keycloak/entities/anigan_user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
+    constructor(
+        @InjectRepository(AniganUserEntity)
+        private readonly userRepository: Repository<AniganUserEntity>,
+    ) { }
+
     extractSubFromToken(authHeader: string): string {
         const token = this.extractToken(authHeader);
         const decodedToken = jwt.decode(token);
@@ -18,5 +26,9 @@ export class AuthService {
             throw new Error('Token missing in Authorization header');
         }
         return token;
+    }
+
+    async isTechnicalUser(authHeader: string) {
+        return process.env.TECHNICAL_USER_ID === this.extractSubFromToken(authHeader)
     }
 }

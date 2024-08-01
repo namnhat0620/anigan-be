@@ -29,7 +29,11 @@ export class ImageService {
     ) { }
 
     async getListImage(headerToken: string, getImageQueryDto: GetImageQueryDto) {
+        console.log({ getImageQueryDto });
+
         const userId = !headerToken ? "" : this.authService.extractSubFromToken(headerToken)
+        console.log({ userId });
+
         const page = +getImageQueryDto.page || 1;
         const limit = +getImageQueryDto.limit || 20;
         const skip = (page - 1) * limit;
@@ -41,7 +45,7 @@ export class ImageService {
             },
             {
                 type: getImageQueryDto.type,
-                created_by: getImageQueryDto.device_id
+                created_by: getImageQueryDto.device_id ?? ''
             }],
             take: limit,
             skip,
@@ -63,7 +67,7 @@ export class ImageService {
     async transform(token: string, transformDto: TransformDto): Promise<RefImageResponse> {
         console.log("Enter transform with", { token, transformDto });
         let savedImage: ImageEntity;
-        if (!token) {
+        if (this.authService.isTechnicalUser(token)) {
             const mobileTracking = await this.planService.getTrackingMobile(transformDto.mobile_id);
             if (mobileTracking.number_of_generated >= +process.env.MAX_TIME_GENERATION) {
                 throw new BadRequestException("Reach limit of generation!")

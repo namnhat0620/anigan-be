@@ -33,4 +33,11 @@ export class TransformDto {
         required: true
     })
     mobile_id: string
+
+    @ApiProperty({
+        type: String,
+        description: "Resolution option",
+        required: true
+    })
+    resolution_option: string
 }

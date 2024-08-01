@@ -14,6 +14,8 @@ import { MobileTrackingEntity } from './plan/entity/mobile_tracking.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthMiddleware } from './middleware/auth.middleware';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 config(); // Loads the environment variables from .env
 
@@ -44,7 +46,10 @@ config(); // Loads the environment variables from .env
     }),
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  }],
 })
 // export class AppModule { }
 export class AppModule implements NestModule {

@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as fs from 'fs';
+import { TransformDto } from 'src/image/dto/transform.dto';
+import { ResolutionOption } from 'src/utils/enum/resolutionOption.enum';
 import { promisify } from 'util';
-import { TransformDto } from './dto/transform.dto';
 
 @Injectable()
 export class MlServerService {
@@ -72,12 +73,26 @@ export class MlServerService {
 
     async transform(transformDto: TransformDto): Promise<string> {
         try {
+            let resolution: number;
+            switch (transformDto.resolution_option) {
+                case ResolutionOption._256x256:
+                    resolution = 256;
+                    break;
+                case ResolutionOption._512x512:
+                    resolution = 512;
+                    break;
+                case ResolutionOption._1024x1024:
+                    resolution = 1024;
+                    break;
+            }
+
             //Send request to ML server
             const response = await axios.post(
                 `${process.env.ML_SERVER_URL}/transform`,
                 {
                     sourceImg: `/content/${this.convertUrl(transformDto.source_img)}`,
-                    referenceImg: transformDto.reference_img
+                    referenceImg: transformDto.reference_img,
+                    resolution: resolution
                 },
                 {
                     responseType: 'text'

@@ -13,13 +13,5 @@ export class AuthMiddleware implements NestMiddleware {
         }
 
         next()
-
-        // try {
-        //     const user = jwt.verify(token, 'secret-key'); // Verify token
-        //     req.user = user; // Optionally, add user info to req object
-        //     next(); // Pass control to the next middleware or route handler
-        // } catch (err) {
-        //     return res.status(403).json({ message: 'Forbidden' }); // Forbidden
-        // }
     }
 }

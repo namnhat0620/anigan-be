@@ -91,7 +91,7 @@ export class UploadController {
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
 
     const path = file.path.split('\\').join('/')
-    const createdBy = !token ? body?.mobile_id : this.authService.extractSubFromToken(token);
+    const createdBy = this.authService.isTechnicalUser(token) ? body?.mobile_id : this.authService.extractSubFromToken(token);
     const savedImage = await this.imageService.saveImage({
       type: ImageType.USER_IMAGE,
       url: path,
