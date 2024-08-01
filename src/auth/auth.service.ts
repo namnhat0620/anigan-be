@@ -28,7 +28,7 @@ export class AuthService {
         return token;
     }
 
-    async isTechnicalUser(authHeader: string) {
+    isTechnicalUser(authHeader: string) {
         return process.env.TECHNICAL_USER_ID === this.extractSubFromToken(authHeader)
     }
 }

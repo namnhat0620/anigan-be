@@ -29,8 +29,9 @@ export class PlanService {
         console.debug("Enter getPlan with", { authHeader, device_id });
 
         const maxTimeGenerationConfig = +process.env.MAX_TIME_GENERATION
-        if (!authHeader) {
-            const mobileTracking = await this.getTrackingMobile(authHeader)
+        if (this.authService.isTechnicalUser(authHeader)) {
+            const mobileTracking = await this.getTrackingMobile(device_id)
+
             return new GetPlanResponse({
                 remain_generation: maxTimeGenerationConfig - mobileTracking.number_of_generated,
                 expired_day: "Illuminate the pro flag"
