@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, HttpException, HttpStatus, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Headers, HttpException, HttpStatus, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { extname } from 'path';
@@ -42,6 +42,10 @@ export class UploadController {
   ) {
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
+    const maxSizeInBytes = 4 * 1024 * 1024; // 5MB
+    if (file.size > maxSizeInBytes) {
+      throw new BadRequestException('File size exceeds 4MB');
+    }
 
     const path = file.path.split('\\').join('/')
     //Save to db
@@ -89,6 +93,10 @@ export class UploadController {
 
     if (req.fileValidationError) throw new HttpException(req.fileValidationError, HttpStatus.BAD_REQUEST)
     if (!file) throw new HttpException('File is required', HttpStatus.BAD_REQUEST)
+    const maxSizeInBytes = 4 * 1024 * 1024; // 5MB
+    if (file.size > maxSizeInBytes) {
+      throw new BadRequestException('File size exceeds 4MB');
+    }
 
     const path = file.path.split('\\').join('/')
     const createdBy = this.authService.isTechnicalUser(token) ? body?.mobile_id : this.authService.extractSubFromToken(token);
