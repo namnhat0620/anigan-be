@@ -46,10 +46,7 @@ config(); // Loads the environment variables from .env
     }),
   ],
   controllers: [AppController],
-  providers: [{
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard,
-  }],
+  providers: [],
 })
 // export class AppModule { }
 export class AppModule implements NestModule {
